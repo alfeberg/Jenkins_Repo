@@ -2,13 +2,23 @@ pipeline {
     agent any
 
     parameters {
-        string(name: 'USERNAME', defaultValue: 'Alcher', description: 'Who triggered this?')
+        string(name: 'USERNAME', defaultValue: 'Alcher', description: 'Your name')
+        string(name: 'BRANCH', defaultValue: 'main', description: 'Git branch to build')
+        choice(name: 'ENVIRONMENT', choices: ['dev', 'staging', 'prod'], description: 'Deployment environment')
     }
 
     stages {
+        stage('Info') {
+            steps {
+                echo "Hello, ${params.USERNAME}!"
+                echo "Selected Branch: ${params.BRANCH}"
+                echo "Target Environment: ${params.ENVIRONMENT}"
+            }
+        }
+
         stage('Clone Repo') {
             steps {
-                echo "Cloning repository..."
+                git branch: "${params.BRANCH}", url: 'https://github.com/alfeberg/Jenkins_Repo.git'
             }
         }
 
@@ -16,20 +26,6 @@ pipeline {
             steps {
                 sh 'chmod +x hello.sh'
                 sh './hello.sh'
-            }
-        }
-
-        stage('Simulate Build') {
-            steps {
-                echo "Simulating build..."
-                sh 'sleep 2'
-                echo "Build completed successfully."
-            }
-        }
-
-        stage('Show Parameter') {
-            steps {
-                echo "Triggered by: ${params.USERNAME}"
             }
         }
     }
