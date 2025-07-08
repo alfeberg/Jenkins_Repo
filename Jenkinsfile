@@ -1,10 +1,14 @@
 pipeline {
     agent any
 
+    parameters {
+        string(name: 'USERNAME', defaultValue: 'Alcher', description: 'Who triggered this?')
+    }
+
     stages {
         stage('Clone Repo') {
             steps {
-                echo 'Cloning repository...'
+                echo "Cloning repository..."
             }
         }
 
@@ -17,9 +21,15 @@ pipeline {
 
         stage('Simulate Build') {
             steps {
-                echo 'Simulating build...'
+                echo "Simulating build..."
                 sh 'sleep 2'
-                echo 'Build completed successfully.'
+                echo "Build completed successfully."
+            }
+        }
+
+        stage('Show Parameter') {
+            steps {
+                echo "Triggered by: ${params.USERNAME}"
             }
         }
     }
