@@ -3,8 +3,8 @@ pipeline {
 
     parameters {
         string(name: 'USERNAME', defaultValue: 'Alcher', description: 'Your name')
-        string(name: 'BRANCH', defaultValue: 'main', description: 'Branch to build')
-        choice(name: 'ENVIRONMENT', choices: ['dev', 'qa', 'prod'], description: 'Target environment')
+        string(name: 'BRANCH', defaultValue: 'main', description: 'Git branch to build')
+        choice(name: 'ENVIRONMENT', choices: ['dev', 'qa', 'prod'], description: 'Environment to deploy to')
     }
 
     stages {
@@ -29,7 +29,6 @@ pipeline {
             }
         }
 
-        // 👇 NEW STAGES
         stage('Test') {
             steps {
                 echo "Running tests..."
@@ -43,13 +42,12 @@ pipeline {
                 sh 'echo Deploy complete!'
             }
         }
-    }
-}
-stage('Build Docker Image') {
-    steps {
-        script {
-            // Build the Docker image
-            sh 'docker build -t myimage:latest .'
+
+        stage('Build Docker Image') {
+            steps {
+                echo "🔧 Building Docker image..."
+                sh 'docker build -t jenkins-demo:latest .'
+            }
         }
     }
 }
