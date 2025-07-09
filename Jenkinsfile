@@ -3,8 +3,8 @@ pipeline {
 
     parameters {
         string(name: 'USERNAME', defaultValue: 'Alcher', description: 'Your name')
-        string(name: 'BRANCH', defaultValue: 'main', description: 'Git branch to build')
-        choice(name: 'ENVIRONMENT', choices: ['dev', 'staging', 'prod'], description: 'Deployment environment')
+        string(name: 'BRANCH', defaultValue: 'main', description: 'Branch to build')
+        choice(name: 'ENVIRONMENT', choices: ['dev', 'qa', 'prod'], description: 'Target environment')
     }
 
     stages {
@@ -26,6 +26,21 @@ pipeline {
             steps {
                 sh 'chmod +x hello.sh'
                 sh './hello.sh'
+            }
+        }
+
+        // 👇 NEW STAGES
+        stage('Test') {
+            steps {
+                echo "Running tests..."
+                sh 'echo All tests passed!'
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                echo "Deploying to ${params.ENVIRONMENT} environment..."
+                sh 'echo Deploy complete!'
             }
         }
     }
