@@ -1,0 +1,5 @@
+CREATE TABLE IF NOT EXISTS deployment_test (
+    id SERIAL PRIMARY KEY,
+    message TEXT NOT NULL,
+    deployed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
