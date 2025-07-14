@@ -2,54 +2,32 @@ pipeline {
     agent any
 
     parameters {
-        string(name: 'USERNAME', defaultValue: 'Alcher', description: 'Your name')
-        string(name: 'BRANCH', defaultValue: 'main', description: 'Git branch to build')
-        choice(name: 'ENVIRONMENT', choices: ['dev', 'qa', 'prod'], description: 'Environment to deploy to')
+        string(name: 'BRANCH', defaultValue: 'main', description: 'Git branch to deploy')
+        choice(name: 'ENVIRONMENT', choices: ['dev', 'staging', 'prod'], description: 'Target environment')
+    }
+
+    environment {
+        DB_HOST = 'testagfdb.cdegom4cy0q6.eu-north-1.rds.amazonaws.com'
+        DB_NAME = 'agftestdb'
+        DB_USER = 'postgres'
+        DB_PASS = 'F3l!c!00813'
     }
 
     stages {
-        stage('Info') {
-            steps {
-                echo "Hello, ${params.USERNAME}!"
-                echo "Selected Branch: ${params.BRANCH}"
-                echo "Target Environment: ${params.ENVIRONMENT}"
-            }
-        }
-
-        stage('Clone Repo') {
+        stage('Checkout') {
             steps {
                 git branch: "${params.BRANCH}", url: 'https://github.com/alfeberg/Jenkins_Repo.git'
             }
         }
 
-        stage('Run Script') {
+        stage('Deploy SQL') {
             steps {
-                sh 'chmod +x hello.sh'
-                sh './hello.sh'
-            }
-        }
-
-        stage('Test') {
-            steps {
-                echo "Running tests..."
-                sh 'echo All tests passed!'
-            }
-        }
-
-        stage('Deploy') {
-            steps {
-                echo "Deploying to ${params.ENVIRONMENT} environment..."
-                sh 'echo Deploy complete!'
-            }
-        }
-
-        stage('Build Docker Image') {
-            steps {
-                script {
-                    echo "🔧 Building Docker image..."
-                    sh 'docker build -t jenkins-demo:latest .'
-                }
+                sh '''
+                export PGPASSWORD=${DB_PASS}
+                psql -h ${DB_HOST} -U ${DB_USER} -d ${DB_NAME} -f db/update_script.sql
+                '''
             }
         }
     }
 }
+
